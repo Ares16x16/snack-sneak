@@ -2,7 +2,7 @@
 
 Two short Hong Kong café games. **Snack Sneak:** hold to eat, release before the boss turns. **Tray Chaos:** catch snacks, dodge pigeons. Choose either from the Games menu.
 
-English and Traditional Chinese. Daily challenges reset at Hong Kong midnight. Scores stay on the device. No backend, account, analytics or enabled ads.
+English and Traditional Chinese. Daily challenges reset at Hong Kong midnight. Scores stay on the device. No game backend or account. Ads are disabled; optional PostHog analytics waits for consent and project configuration.
 
 ## Test locally
 
@@ -80,6 +80,41 @@ npm run dev
 ```
 
 Edit `public/game-config.json` for text, colours and the Games menu. Edit the generated `public/assets/game.js` for gameplay. The generated README describes the adapter. Daily/practice, pause, results and sharing are included. Each generated project has its own Pages workflow and Cloudflare deployment settings. Existing folders are never overwritten.
+
+## Gameplay analytics (PostHog)
+
+Analytics is implemented but disabled until a real project is connected. Create a free project at <https://app.posthog.com/signup>. In Project settings, copy the **public Project Token** (`phc_…`) and confirm US or EU. Never put a personal/secret API key in this site.
+
+Set `analytics` in `public/site-config.json`:
+
+```json
+"analytics": {
+  "enabled": true,
+  "projectToken": "YOUR-PUBLIC-phc_-PROJECT-TOKEN",
+  "region": "us"
+}
+```
+
+Use `eu` for an EU project. The placeholder above is not a usable token; the build rejects it. The build adds only the selected ingestion host to CSP `connect-src`; it does not allow external scripts. The integration calls PostHog's public event API directly, without loading an SDK, autocapture or session replay.
+
+Players choose Allow or No thanks, and can change their choice using Analytics in the footer. Until consent, no events or analytics identifiers are created. GPC/Do Not Track disable collection. Local previews never send events. Consenting browser identifiers expire after 90 days; clearing/denying removes them. Counts are approximate browsers, not verified people. Denied visitors and blocked requests are missing from the dashboard. No pre-consent events or rounds are sent later.
+
+| Event | Useful properties |
+| --- | --- |
+| `$pageview` | Sanitized URL/path, coarse `traffic_source` |
+| `game_start` | `game_id`, `mode`, `language`, `run_id` |
+| `game_end` | `score`, `reason`, `active_seconds`, `round_seconds`, game-specific stats |
+| `game_abandon` | Active duration, latest available score, `reason` |
+| `game_pause`, `game_resume` | Active duration at the transition |
+| `game_progress` | Cumulative active duration/score, at most once per 10 seconds |
+| `game_replay` | Another round in the same consenting page lifecycle |
+| `share_click` | `channel`, game/mode/language; never proof of publication |
+
+In PostHog, check **Activity / live events** first. Suggested dashboard views: unique browsers on `$pageview`, starts and completion rate by `game_id`, average/percentile `score` on `game_end`, average `active_seconds` on `game_end` and `game_abandon`, replay rate, and share clicks by channel. Durations are cumulative per round: do not sum progress, pause and end snapshots together. For exits where the browser drops the final request, progress is only a lower-bound estimate.
+
+In Project settings, disable client IP capture if you do not want IPs retained. These events request disabled GeoIP enrichment, but PostHog still receives connection information. Review provider retention settings and the shipped privacy notice. Browser events can be blocked or forged and do not establish a trusted leaderboard.
+
+After connecting the real project, rebuild and deploy, opt in on the public site, complete one round and check that its events arrive. A local test pass cannot verify your PostHog account or dashboard. New generated games copy the integration with analytics disabled and an empty token so they never send to another game's project accidentally.
 
 ## What goes into Git
 

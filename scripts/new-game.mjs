@@ -26,7 +26,7 @@ export async function createGameProject({id,name,destination=join(projectRoot,'g
   await cp(join(projectRoot,'starter/game.js'),join(staging,'public/assets/game.js'));await cp(join(projectRoot,'starter/main.js'),join(staging,'public/assets/main.js'));
   await cp(join(projectRoot,'public/_headers'),join(staging,'public/_headers'));
   await writeFile(join(staging,'public/game-config.json'),JSON.stringify(config,null,2)+'\n');
-  await writeFile(join(staging,'public/site-config.json'),JSON.stringify({site:{url:'',contactEmail:''},adsense:{enabled:false,publisherId:'',slotId:''}},null,2)+'\n');
+  await writeFile(join(staging,'public/site-config.json'),JSON.stringify({site:{url:'',contactEmail:''},adsense:{enabled:false,publisherId:'',slotId:''},analytics:{enabled:false,projectToken:'',region:'us'}},null,2)+'\n');
   await writeFile(join(staging,'public/robots.txt'),'User-agent: *\nAllow: /\n');
   await writeFile(join(staging,'public/manifest.webmanifest'),JSON.stringify({name:config.name,short_name:config.name,start_url:'/',display:'standalone',background_color:config.palette.paper,theme_color:config.palette.ink},null,2)+'\n');
   const original=JSON.parse(await readFile(join(projectRoot,'package.json'),'utf8'));

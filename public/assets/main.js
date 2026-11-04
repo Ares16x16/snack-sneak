@@ -1,3 +1,6 @@
+import {analytics} from './game-kit/analytics.js';
+import {createRoundTracker} from './game-kit/analytics-round.js';
+const tracking=createRoundTracker(analytics);
 import { ROUND_SECONDS, FIXED_STEP, clamp, challengeDate, normalizeChallenge, createGame, stepGame, summarizeGame, upcomingEvent, shout } from './engine.js';
 import { readBest, recordBest, getPreference, setPreference } from './storage.js';
 import { translate } from './i18n.js';
@@ -100,6 +103,7 @@ function startRound() {
   if(mode==='daily'&&!linkedDate)date=challengeDate();
   if(mode==='practice')practiceRun??=newPracticeRun();
   state=createGame({seed:mode==='daily'?'daily:'+date:'practice:'+practiceRun,mode});
+  tracking.start({game_id:'tray-chaos',mode,language});
   summary=null;image=null;imageVersion++;accumulator=0;previousTime=performance.now();resetInput();
   $('new-best').hidden=true;$('manual-share-link').hidden=true;
   setPhase('running');audio.unlock();audio.play('start');canvas.focus({preventScroll:true});
@@ -108,14 +112,15 @@ function startRound() {
 }
 function pauseRound() {
   if(phase!=='running')return;
-  resetInput();accumulator=0;setPhase('paused');$('resume-button').focus({preventScroll:true});
+  tracking.pause();resetInput();accumulator=0;setPhase('paused');$('resume-button').focus({preventScroll:true});
 }
 function resumeRound() {
   if(phase!=='paused')return;
-  resetInput();accumulator=0;previousTime=performance.now();setPhase('running');canvas.focus({preventScroll:true});
+  tracking.resume();resetInput();accumulator=0;previousTime=performance.now();setPhase('running');canvas.focus({preventScroll:true});
 }
 function finishRound() {
   summary=summarizeGame(state);
+  tracking.finish({score:summary.score,reason:summary.reason,round_seconds:summary.seconds,saved:summary.saved,best_combo:summary.bestCombo});
   const previousBest=readBest(storage,bestKey());
   recordBest(storage,bestKey(),summary.score);
   resetInput();setPhase('result');renderResult();
@@ -139,7 +144,8 @@ async function prepareImage() {
 function getLink() {
   return challengeLink({origin:location.origin,mode,seed:summary.seed,date,score:summary.score,language});
 }
-async function copyLink() {
+async function copyLink(track=true) {
+  if(track)tracking.share('copy_link',{game_id:'tray-chaos',mode,language});
   const link=getLink();
   const field=$('manual-share-link');field.hidden=false;field.value=link;
   try {
@@ -151,6 +157,7 @@ async function copyLink() {
 }
 async function shareResult() {
   if(!summary)return;
+  tracking.share('native',{game_id:'tray-chaos',mode,language});
   const title='Tray Chaos',text=t('shareText',summary),url=getLink();
   try {
     if(image&&navigator.canShare) {
@@ -158,7 +165,7 @@ async function shareResult() {
       if(navigator.canShare({files:[file]})){await navigator.share({title,text:text+' '+url,files:[file]});return;}
     }
     if(navigator.share){await navigator.share({title,text,url});return;}
-    await copyLink();
+    await copyLink(false);
   } catch(error) {
     if(error.name==='AbortError')announce(t('shareCancelled'));
     else { announce(t('shareFailed'));const field=$('manual-share-link');field.hidden=false;field.value=url; }
@@ -202,7 +209,7 @@ function frame(now) {
     const before=state.items.filter(item=>item.active).length;
     while(accumulator>=FIXED_STEP&&state.status==='running'){stepGame(state,inputValue(),FIXED_STEP);accumulator-=FIXED_STEP;}
     if(state.items.filter(item=>item.active).length<before)audio.play('spill');
-    renderHud();
+    tracking.progress({score:state.points});renderHud();
     if(state.status==='finished')finishRound();
   }
   if(context)drawScene(context,state,{idle:phase==='idle',reducedMotion:motion.matches,time:phase==='idle'?now/1000:state.elapsed});
@@ -218,8 +225,8 @@ $('restart-button').addEventListener('click',startRound);
 $('pause-button').addEventListener('click',pauseRound);
 $('resume-button').addEventListener('click',resumeRound);
 $('share-button').addEventListener('click',shareResult);
-$('copy-button').addEventListener('click',copyLink);
-$('download-button').addEventListener('click',()=>{if(image){downloadImage(image,'tray-chaos-'+(mode==='daily'?date:'practice')+'.png');announce(t('downloading'));}});
+$('copy-button').addEventListener('click',()=>copyLink());
+$('download-button').addEventListener('click',()=>{if(image){tracking.share('save_post',{game_id:'tray-chaos',mode,language});downloadImage(image,'tray-chaos-'+(mode==='daily'?date:'practice')+'.png');announce(t('downloading'));}});
 $('language-toggle').addEventListener('click',()=>{language=language==='en'?'zh-Hant':'en';setPreference(storage,'language',language);applyLanguage();});
 $('sound-toggle').addEventListener('click',()=>{audioEnabled=!audioEnabled;audio.setEnabled(audioEnabled);setPreference(storage,'sound',audioEnabled?'on':'off');refreshSound();if(audioEnabled)audio.play('start');});
 for(const choice of ['daily','practice']) {
@@ -262,6 +269,7 @@ document.addEventListener('keydown',event=>{
 document.addEventListener('keyup',event=>keys.delete(event.code));
 document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseRound();});
 window.addEventListener('blur',pauseRound);
+window.addEventListener('pagehide',event=>{if(event.persisted)tracking.pause();else tracking.abandon('page_leave',{score:state.points});});
 applyLanguage();setPhase('idle');renderHud();
 if(!context){$('start-button').disabled=true;announce(t('noCanvas'));}
 requestAnimationFrame(frame);

@@ -9,22 +9,23 @@ const copy={
 function element(tag,className,text){const e=document.createElement(tag);if(className)e.className=className;if(text!==undefined)e.textContent=text;return e;}
 function button(label,handler,className='share-quiet'){const e=element('button',className,label);e.type='button';e.addEventListener('click',handler);return e;}
 function download(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);}
-export function createSharePanel({root,trigger,config,onStatus=()=>{},navigator:nav=globalThis.navigator}){
+export function createSharePanel({root,trigger,config,onStatus=()=>{},onAction=()=>{},navigator:nav=globalThis.navigator}){
  let result=null,language='en',post=null,story=null,previewURL=null,version=0,open=false,storyOpen=false,largePreview=false;
  let postButton,storySave,storyShare,storyPreview,storyStatus,manualInput;
  const t=key=>(copy[language]??copy.en)[key];
+ function action(channel){try{onAction(channel);}catch{}}
  function status(key){onStatus(t(key));}
  function revoke(){if(previewURL){URL.revokeObjectURL(previewURL);previewURL=null;}}
  function display(){root.hidden=!open;trigger?.setAttribute('aria-expanded',String(open));}
  async function copyLink(){
-  if(!result)return;const current=version,url=result.url;
+  if(!result)return;action('copy_link');const current=version,url=result.url;
   const copied=await copyText(nav,url);
   if(current!==version)return;
   if(copied){status(isPublicURL(url)?'copied':'localCopied');return;}
   manualInput.hidden=false;manualInput.value=url;manualInput.focus();manualInput.select();status('manual');
  }
  async function share(file){
-  if(!result)return;const current=version;
+  if(!result)return;action('native');const current=version;
   const outcome=await nativeShare(nav,{file,title:config.name,text:result.message,...(isPublicURL(result.url)?{url:result.url}:{})});
   if(current!==version)return;
   status(outcome==='handed-off'?'handoff':outcome==='cancelled'?'cancelled':outcome==='unsupported'?'unsupported':'failed');
@@ -36,20 +37,20 @@ export function createSharePanel({root,trigger,config,onStatus=()=>{},navigator:
   const channels=element('div','share-channels'),links=shareLinks({message:result.message,url:result.url});
   for(const key of ['threads','x','whatsapp']){
    const link=element('a','share-channel',t(key));link.target='_blank';link.rel='noopener noreferrer';
-   if(links[key])link.href=links[key];else{link.setAttribute('aria-disabled','true');link.tabIndex=-1;}
+   if(links[key]){link.href=links[key];link.addEventListener('click',()=>action(key));}else{link.setAttribute('aria-disabled','true');link.tabIndex=-1;}
    channels.append(link);
   }
-  const instagram=button(t('instagram'),()=>{storyOpen=!storyOpen;storySection.hidden=!storyOpen;instagram.setAttribute('aria-expanded',String(storyOpen));},'share-channel');
+  const instagram=button(t('instagram'),()=>{storyOpen=!storyOpen;if(storyOpen)action('instagram');storySection.hidden=!storyOpen;instagram.setAttribute('aria-expanded',String(storyOpen));},'share-channel');
   instagram.setAttribute('aria-expanded',String(storyOpen));instagram.setAttribute('aria-controls',root.id+'-story');channels.append(instagram);root.append(channels);
   if(!isPublicURL(result.url))root.append(element('p','share-preview-note',t('local')));
   const actions=element('div','share-tools');actions.append(button(t('copy'),copyLink));
-  postButton=button(t('save'),()=>{if(post){download(post,config.id+'-result.png');status('saved');}});postButton.disabled=!post;actions.append(postButton);
+  postButton=button(t('save'),()=>{if(post){action('save_post');download(post,config.id+'-result.png');status('saved');}});postButton.disabled=!post;actions.append(postButton);
   if(typeof nav?.share==='function')actions.append(button(t('native'),()=>share(post?new File([post],config.id+'-result.png',{type:'image/png'}):undefined)));
   root.append(actions);manualInput=element('input','share-manual');manualInput.type='url';manualInput.readOnly=true;manualInput.hidden=true;manualInput.setAttribute('aria-label',t('copy'));root.append(manualInput);
   const storySection=element('section','share-story');storySection.id=root.id+'-story';storySection.hidden=!storyOpen;
   storySection.append(element('h4','',t('storyTitle')),element('p','',t('storySteps')));
   storyPreview=element('div','share-story-preview');storyStatus=element('p','share-image-status',story?t('ready'):t('preparing'));storyStatus.setAttribute('role','status');
-  const storyActions=element('div','share-story-actions');storySave=button(t('saveStory'),()=>{if(story){download(story,config.id+'-story.png');status('saved');}},'share-solid');storySave.disabled=!story;
+  const storyActions=element('div','share-story-actions');storySave=button(t('saveStory'),()=>{if(story){action('save_story');download(story,config.id+'-story.png');status('saved');}},'share-solid');storySave.disabled=!story;
   storyShare=button(t('shareStory'),()=>{if(story)share(new File([story],config.id+'-story.png',{type:'image/png'}));},'share-channel');storyShare.disabled=!story;
   if(typeof nav?.share!=='function')storyShare.hidden=true;
   storyActions.append(storySave,storyShare,button(t('copy'),copyLink));storySection.append(storyPreview,storyStatus,storyActions);root.append(storySection);

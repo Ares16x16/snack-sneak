@@ -1,3 +1,4 @@
+import './analytics.js';
 import {loadGameConfig} from './config.js';
 import {menuItems} from './menu-model.js';
 const menus=[...document.querySelectorAll('[data-game-menu]')];

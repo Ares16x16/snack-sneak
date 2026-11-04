@@ -1,3 +1,6 @@
+import {analytics} from '../game-kit/analytics.js';
+import {createRoundTracker} from '../game-kit/analytics-round.js';
+const tracking=createRoundTracker(analytics);
 import {localPath} from '../game-kit/site-path.js';
 import {createRun,stepRun,bossPhase,currentFood,summarizeRun,ROUND_SECONDS} from './engine.js';
 import {drawScene,drawReview,drawResultScene} from './renderer.js';
@@ -23,7 +26,7 @@ const canvas=$('snack-canvas'),ctx=canvas.getContext('2d'),reduced=matchMedia('(
 const pointers=new Set();let keyHeld=false,last=performance.now(),accumulator=0,lastBoss='',messageTimer;
 const audio=createAudio();let sound=getPreference(storage,'sound','off')==='on';audio.setEnabled(sound);
 const gameConfig=await loadGameConfig().catch(()=>validateGameConfig({id:'snack-sneak',challengeId:'v2',name:'Snack Sneak'}));
-const sharing=createSharePanel({root:$('result-sharing'),trigger:$('share-review'),config:gameConfig,onStatus:message=>say(message)});
+const sharing=createSharePanel({root:$('result-sharing'),trigger:$('share-review'),config:gameConfig,onStatus:message=>say(message),onAction:channel=>tracking.share(channel,{game_id:gameConfig.id,mode,language:lang})});
 const t=(key,values)=>text(lang,key,values);
 const bestKey=()=>'boss-v2:'+(mode==='daily'?date:'practice');
 const format=n=>new Intl.NumberFormat(lang==='en'?'en':'zh-Hant').format(n);
@@ -61,15 +64,16 @@ function start(){
  if(mode==='daily'&&!linkedDate)date=challengeDate();
  if(mode==='practice')practiceId??=randomId();
  run=createRun(mode==='daily'?'daily:'+date:'practice:'+practiceId);
+ tracking.start({game_id:gameConfig.id,mode,language:lang});
  summary=null;sharing.reset();resetInput();accumulator=0;last=performance.now();lastBoss='';
  $('record-note').hidden=true;
  setScreen('running');audio.unlock();audio.play('start');canvas.focus({preventScroll:true});
  $('snack-game').scrollIntoView({behavior:reduced.matches?'instant':'smooth',block:'start'});renderHud();
 }
-function pause(){if(screen!=='running')return;resetInput();accumulator=0;setScreen('paused');$('resume-run').focus({preventScroll:true});}
-function resume(){if(screen!=='paused')return;resetInput();accumulator=0;lastBoss='';last=performance.now();setScreen('running');canvas.focus({preventScroll:true});}
+function pause(){if(screen!=='running')return;tracking.pause();resetInput();accumulator=0;setScreen('paused');$('resume-run').focus({preventScroll:true});}
+function resume(){if(screen!=='paused')return;tracking.resume();resetInput();accumulator=0;lastBoss='';last=performance.now();setScreen('running');canvas.focus({preventScroll:true});}
 function finish(){
- summary=summarizeRun(run);const previous=readBest(storage,bestKey());recordBest(storage,bestKey(),summary.score);
+ summary=summarizeRun(run);tracking.finish({score:summary.score,reason:summary.reason,round_seconds:summary.seconds,bites:summary.bites,snacks:summary.snacks,strikes:summary.strikes,near_misses:summary.nearMisses});const previous=readBest(storage,bestKey());recordBest(storage,bestKey(),summary.score);
  resetInput();setScreen('result');renderResult();$('record-note').hidden=summary.score<=previous;
  $('review-layer').focus({preventScroll:true});audio.play('end');prepareImage();
 }
@@ -101,7 +105,8 @@ function renderHud(){
 function chooseMode(value){
  if(screen==='running'||screen==='paused')return;
  mode=value;if(value==='practice')practiceId=linkedPractice??null;
- run=createRun('daily:'+date);summary=null;sharing.reset();resetInput();setScreen('idle');renderHud();
+ run=createRun('daily:'+date);
+ summary=null;sharing.reset();resetInput();setScreen('idle');renderHud();
 }
 function getLink(){
  return challengeLink({origin:location.origin,path:localPath('/'),gameId:gameConfig.challengeId,mode,date,runId:practiceId,score:summary.score,language:lang});
@@ -120,7 +125,7 @@ function frame(now){
   accumulator+=dt;const beforeBites=run.bites,beforeStrikes=run.strikes,beforeSnacks=run.snacks;
   while(accumulator>=1/120&&run.status==='running'){stepRun(run,pointers.size>0||keyHeld,1/120);accumulator-=1/120;}
   if(run.strikes>beforeStrikes)audio.play('spill');else if(run.snacks>beforeSnacks)audio.play('end');else if(run.bites>beforeBites)audio.play('start');
-  renderHud();if(run.status==='finished')finish();
+  tracking.progress({score:run.score});renderHud();if(run.status==='finished')finish();
  }
  if(ctx)drawScene(ctx,run,{idle:screen==='idle',reduced:reduced.matches,time:screen==='idle'?now/1000:run.elapsed});
  requestAnimationFrame(frame);
@@ -150,5 +155,6 @@ document.addEventListener('keydown',event=>{
 });
 document.addEventListener('keyup',event=>{if(event.code==='Space'||event.code==='Enter')keyHeld=false;});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)pause();});window.addEventListener('blur',pause);
+window.addEventListener('pagehide',event=>{if(event.persisted)tracking.pause();else tracking.abandon('page_leave',{score:run.score});});
 language();setScreen('idle');renderHud();if(!ctx)$('start-run').disabled=true;requestAnimationFrame(frame);
 

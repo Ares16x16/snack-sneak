@@ -1,3 +1,4 @@
+import {validateAnalytics} from '../public/assets/game-kit/analytics-core.js';
 import { cp, mkdir, readdir, readFile, writeFile, rm } from 'node:fs/promises';
 import { resolve, relative, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -20,7 +21,7 @@ export function validateConfig(config) {
     if(url.protocol!=='https:'||url.username||url.password||url.pathname!=='/'||url.search||url.hash)throw new Error('Site URL must be an https origin without a path or credentials.');
     origin=url.origin;
   }
-  return {publisher,origin};
+  return {publisher,origin,analytics:validateAnalytics(config.analytics)};
 }
 const attr=value=>value.replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll('<','&lt;');
 const plain=value=>attr(String(value??'')).replaceAll('>','&gt;');
@@ -52,7 +53,7 @@ export async function buildSite({sourceDir=join(projectRoot,'public'),outputDir=
   if(outputDir===sourceDir||sourceDir.startsWith(outputDir+'/'))throw new Error('Build output must not contain the source directory.');
   await listFiles(sourceDir);
   const config=JSON.parse(await readFile(join(sourceDir,'site-config.json'),'utf8'));
-  const {publisher,origin}=validateConfig(config);
+  const {publisher,origin,analytics}=validateConfig(config);
   const rawGame=await readFile(join(sourceDir,'game-config.json'),'utf8').catch(error=>{if(error.code==='ENOENT')return null;throw error;});
   const game=rawGame?validateGameConfig(JSON.parse(rawGame)):null;
   if(game?.socialImage){
@@ -62,6 +63,11 @@ export async function buildSite({sourceDir=join(projectRoot,'public'),outputDir=
   await rm(outputDir,{recursive:true,force:true});await mkdir(outputDir,{recursive:true});
   await cp(sourceDir,outputDir,{recursive:true});
   await listFiles(outputDir);
+  if(analytics.enabled){
+    const path=join(outputDir,'_headers'),headers=await readFile(path,'utf8');
+    if(!/connect-src\s+'self'/.test(headers))throw new Error('Analytics requires a same-origin connect-src policy to extend.');
+    await writeFile(path,headers.replace(/connect-src\s+[^;]+/,"connect-src 'self' "+analytics.host));
+  }
   const pages=[];let templateRoot=false;
   for(const file of await htmlFiles(outputDir)) {
     const pathname=relative(outputDir,file).replaceAll('\\','/');

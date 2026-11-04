@@ -7,5 +7,10 @@
     "enabled": false,
     "publisherId": "",
     "slotId": ""
+  },
+  "analytics": {
+    "enabled": false,
+    "projectToken": "",
+    "region": "us"
   }
 }

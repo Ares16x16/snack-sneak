@@ -78,3 +78,7 @@ Use the Cloudflare commands above for login and deployment. After deployment, ru
 Create an empty GitHub repository, push this project to main, then choose Settings → Pages → GitHub Actions. The included workflow builds and deploys the site automatically.
 
 For a local project-path build: `npm run build:pages -- --url https://YOUR-USERNAME.github.io/YOUR-REPO/`. Preview the folder at that same path with a static server. Cloudflare remains available with `npm run deploy`.
+
+## Optional PostHog analytics
+
+The generated shell includes consent-gated visits, rounds, active timing, scores, replays and share-click events. Set `analytics.enabled`, public `analytics.projectToken` (`phc_…`) and `analytics.region` (`us` or `eu`) in `public/site-config.json` after creating a PostHog project. No SDK, autocapture or recording is loaded. Default is disabled; local previews and GPC/Do Not Track never send events. Privacy text and bilingual Allow/No thanks controls are included. New projects reset this configuration. Check the real public site and PostHog live events after deployment; the integration cannot create your account.

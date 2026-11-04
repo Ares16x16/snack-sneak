@@ -1,3 +1,6 @@
+import {analytics} from './analytics.js';
+import {createRoundTracker} from './analytics-round.js';
+const tracking=createRoundTracker(analytics);
 import {localPath} from './site-path.js';
 import {challengeDate,readChallenge,challengeLink} from './challenge.js';
 import {gameText} from './config.js';
@@ -15,7 +18,7 @@ export function mountArcade({config,game}){
  let held=false,presses=0,last=performance.now(),accumulator=0;
  const canvas=$('canvas'),context=canvas.getContext('2d'),reduced=matchMedia('(prefers-reduced-motion:reduce)');
  const t=key=>(copy[language]??copy.en)[key],format=n=>new Intl.NumberFormat(language).format(n);
- const sharing=createSharePanel({root:$('sharing'),trigger:$('share'),config,onStatus:message=>{$('message').textContent=message;}});
+ const sharing=createSharePanel({root:$('sharing'),trigger:$('share'),config,onStatus:message=>{$('message').textContent=message;},onAction:channel=>tracking.share(channel,{game_id:config.id,mode,language})});
  const bestKey=()=>mode==='daily'?'best:'+date:'best:practice';
  const best=()=>{const raw=get(bestKey(),'0');return /^\d{1,5}$/.test(raw)?Number(raw):0;};
  for(const [key,color] of Object.entries(config.palette))document.documentElement.style.setProperty('--'+({accent:'red',secondary:'teal'}[key]??key),color);
@@ -35,10 +38,10 @@ export function mountArcade({config,game}){
  function randomId(){const bytes=new Uint8Array(8);crypto.getRandomValues(bytes);return Array.from(bytes,n=>n.toString(16).padStart(2,'0')).join('');}
  function start(){
   if(!context)return;if(mode==='daily'&&!linked.linkedDate)date=challengeDate();if(mode==='practice')runId??=randomId();
-  run=makeRun();clearInput();sharing.reset();accumulator=0;last=performance.now();$('message').textContent='';setScreen('running');canvas.focus({preventScroll:true});
+  tracking.start({game_id:config.id,mode,language});run=makeRun();clearInput();sharing.reset();accumulator=0;last=performance.now();$('message').textContent='';setScreen('running');canvas.focus({preventScroll:true});
  }
- function pause(){if(screen!=='running')return;clearInput();accumulator=0;setScreen('paused');$('resume').focus({preventScroll:true});}
- function resume(){if(screen!=='paused')return;clearInput();last=performance.now();setScreen('running');canvas.focus({preventScroll:true});}
+ function pause(){if(screen!=='running')return;tracking.pause();clearInput();accumulator=0;setScreen('paused');$('resume').focus({preventScroll:true});}
+ function resume(){if(screen!=='paused')return;tracking.resume();clearInput();last=performance.now();setScreen('running');canvas.focus({preventScroll:true});}
  function result(){
   const data=game.result(run,language);data.score=Number.isFinite(data.score)?Math.max(0,Math.min(99999,Math.floor(data.score))):0;
   $('result-title').textContent=data.title;$('final-score').textContent=format(data.score);$('final-detail').textContent=(data.stats??[]).map(s=>s.value+' '+s.label).join(' · ');
@@ -47,7 +50,7 @@ export function mountArcade({config,game}){
   sharing.setResult({...data,mode,date:mode==='daily'?date:t('practice'),url,message:shareMessage(config,data,language)},{language,drawArtwork:c=>game.draw(c,snapshot,{reduced:true,colors:config.palette})});
   return data;
  }
- function finish(){clearInput();setScreen('result');const data=result();put(bestKey(),Math.max(best(),data.score));refresh();$('result').focus({preventScroll:true});}
+ function finish(){clearInput();setScreen('result');const data=result();tracking.finish({score:data.score,reason:run.reason??(run.elapsed>=run.duration-.001?'time':'completed'),round_seconds:run.elapsed});put(bestKey(),Math.max(best(),data.score));refresh();$('result').focus({preventScroll:true});}
  function translate(){
   document.documentElement.lang=language;document.title=config.name;
   for(const e of document.querySelectorAll('[data-game-name]'))e.textContent=config.name;
@@ -83,10 +86,11 @@ export function mountArcade({config,game}){
   if(screen==='running'){
    accumulator+=dt;
    while(accumulator>=1/120&&run.status==='running'){run=game.step(run,{held,presses},1/120)??run;presses=0;accumulator-=1/120;}
-   refresh();if(run.status==='finished')finish();
+   tracking.progress({score:run.score});refresh();if(run.status==='finished')finish();
   }
   if(context&&screen!=='result')game.draw(context,run,{idle:screen==='idle',reduced:reduced.matches,colors:config.palette});
   requestAnimationFrame(frame);
  }
+ window.addEventListener('pagehide',event=>{if(event.persisted)tracking.pause();else tracking.abandon('page_leave',{score:run?.score??0});});
  run=makeRun();translate();setScreen('idle');if(!context)$('start').disabled=true;requestAnimationFrame(frame);
 }
