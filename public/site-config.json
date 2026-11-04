@@ -9,8 +9,8 @@
     "slotId": ""
   },
   "analytics": {
-    "enabled": false,
-    "projectToken": "",
+    "enabled": true,
+    "projectToken": "phc_mV4WiR8RyUgNDDrdH3dSYb3aeCAcxPmgLjjXYUKJf8DH",
     "region": "us"
   }
 }

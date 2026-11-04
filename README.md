@@ -83,7 +83,7 @@ Edit `public/game-config.json` for text, colours and the Games menu. Edit the ge
 
 ## Gameplay analytics (PostHog)
 
-Analytics is implemented but disabled until a real project is connected. Create a free project at <https://app.posthog.com/signup>. In Project settings, copy the **public Project Token** (`phc_…`) and confirm US or EU. Never put a personal/secret API key in this site.
+PostHog analytics is configured for the US project used by this deployment. Players must opt in before events are sent. To connect a different project, create one at <https://app.posthog.com/signup>. In Project settings, copy the **public Project Token** (`phc_…`) and confirm US or EU. Never put a personal/secret API key in this site.
 
 Set `analytics` in `public/site-config.json`:
 
