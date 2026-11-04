@@ -7,21 +7,17 @@ export const analytics={
  play(){client?.enableOnPlay();renderSettings();}
 };
 const strings={
- en:{on:'Analytics: on',off:'Analytics: off',notice:'Playing records playtime and scores. Turn off in the footer.',privacy:'Privacy',toggle:'Turn analytics on or off',signal:'Your browser asks us not to track.'},
- 'zh-HK':{on:'數據分析：已開',off:'數據分析：已關',notice:'開局會記錄遊玩時間同分數，可喺頁尾關閉。',privacy:'私隱',toggle:'開啟或關閉數據分析',signal:'你嘅瀏覽器要求唔追蹤。'},
- 'zh-TW':{on:'數據分析：已開',off:'數據分析：已關',notice:'開始遊戲會記錄遊玩時間與分數，可在頁尾關閉。',privacy:'隱私',toggle:'開啟或關閉數據分析',signal:'你的瀏覽器要求不追蹤。'}
+ en:{on:'Analytics: on',off:'Analytics: off',toggle:'Turn analytics on or off',signal:'Your browser asks us not to track.'},
+ 'zh-HK':{on:'數據分析：已開',off:'數據分析：已關',toggle:'開啟或關閉數據分析',signal:'你嘅瀏覽器要求唔追蹤。'},
+ 'zh-TW':{on:'數據分析：已開',off:'數據分析：已關',toggle:'開啟或關閉數據分析',signal:'你的瀏覽器要求不追蹤。'}
 };
 function analyticsControls(model,privacySignal){
  const doc=document,settings=doc.createElement('button');settings.type='button';settings.className='analytics-settings';
- const starts=doc.querySelectorAll?.('#start-run, #again-run, #restart-run, #start-button, #replay-button, #restart-button, #kit-start, #kit-replay, #kit-restart')??[doc.querySelector('#start-run, #start-button, #kit-start')];
- const notices=[];
- for(const start of starts){if(!start)continue;const notice=doc.createElement('p');notice.className='analytics-play-note';const explanation=doc.createElement('span'),privacy=doc.createElement('a');privacy.href=localPath('/privacy.html');notice.append(explanation,privacy);(start.closest?.('.review-actions, .result-actions, .kit-result-actions')??start).after(notice);notices.push({notice,explanation,privacy});}
  (doc.querySelector('footer nav')??doc.body).append(settings);
  function render(){
   const t=strings[normalizeLanguage(doc.documentElement.lang)]??strings.en,enabled=!privacySignal&&model.choice()!=='denied';
   settings.textContent=t[enabled?'on':'off'];settings.setAttribute('aria-pressed',String(enabled));settings.setAttribute('aria-label',settings.textContent+'. '+t.toggle);settings.dataset.enabled=String(enabled);settings.disabled=privacySignal;
   if(privacySignal)settings.title=t.signal;
-  for(const {notice,explanation,privacy} of notices){explanation.textContent=t.notice+' ';privacy.textContent=t.privacy;notice.hidden=!enabled;}
  }
  settings.addEventListener('click',()=>{model.setConsent(model.choice()==='denied'?'allowed':'denied');render();});
  settings.addEventListener('keydown',event=>{if([' ','Enter','Escape'].includes(event.key))event.stopPropagation();});

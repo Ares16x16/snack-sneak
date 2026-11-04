@@ -83,7 +83,7 @@ Edit `public/game-config.json` for text, colours and the Games menu. Edit the ge
 
 ## Gameplay analytics (PostHog)
 
-PostHog analytics is configured for the US project used by this deployment. Measurement starts on Play, with a short notice and a footer off switch. To connect a different project, create one at <https://app.posthog.com/signup>. In Project settings, copy the **public Project Token** (`phc_…`) and confirm US or EU. Never put a personal/secret API key in this site.
+PostHog analytics is configured for the US project used by this deployment. Measurement starts on Play, with a footer off switch. To connect a different project, create one at <https://app.posthog.com/signup>. In Project settings, copy the **public Project Token** (`phc_…`) and confirm US or EU. Never put a personal/secret API key in this site.
 
 Set `analytics` in `public/site-config.json`:
 
@@ -97,7 +97,7 @@ Set `analytics` in `public/site-config.json`:
 
 Use `eu` for an EU project. The placeholder above is not a usable token; the build rejects it. The build adds only the selected ingestion host to CSP `connect-src`; it does not allow external scripts. The integration calls PostHog's public event API directly, without loading an SDK, autocapture or session replay.
 
-The agreement banner is replaced by a short notice beside Play. Pressing Play starts measurement for a new visitor; the footer Analytics control can switch it off before or during play. Existing opt-outs remain off. Before the first Play, no events or analytics identifiers are created for a new visitor. GPC/Do Not Track disable collection. Local previews never send events. Analytics browser identifiers expire after 90 days; clearing/denying removes them. Counts are approximate browsers, not verified people. Denied visitors and blocked requests are missing from the dashboard. No events or rounds from before activation are sent later.
+Analytics controls are in the footer. Pressing Play starts measurement for a new visitor; the footer Analytics control can switch it off before or during play. Existing opt-outs remain off. Before the first Play, no events or analytics identifiers are created for a new visitor. GPC/Do Not Track disable collection. Local previews never send events. Analytics browser identifiers expire after 90 days; clearing/denying removes them. Counts are approximate browsers, not verified people. Denied visitors and blocked requests are missing from the dashboard. No events or rounds from before activation are sent later.
 
 | Event | Useful properties |
 | --- | --- |

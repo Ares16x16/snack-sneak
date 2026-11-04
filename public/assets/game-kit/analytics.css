@@ -3,5 +3,3 @@
 .analytics-settings[data-enabled=false]::before{background:var(--muted,#536b5b)}
 .analytics-settings:hover{text-decoration:underline;text-underline-offset:4px}.analytics-settings:disabled{cursor:default}
 .analytics-settings:focus-visible{outline:3px solid var(--red,#c63826);outline-offset:4px}
-.analytics-play-note{flex:none;max-width:42ch;margin:8px 0 0;font:400 12px/1.5 var(--body,"DM Sans",sans-serif);color:var(--muted,#536b5b);text-align:center}
-.analytics-play-note[hidden]{display:none}.analytics-play-note a{color:inherit;text-underline-offset:3px}
