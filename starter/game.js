@@ -10,7 +10,7 @@ export function step(state,input,seconds){
  if(state.elapsed>=state.duration)state.status='finished';return state;
 }
 export function result(state,language){
- return {score:state.score,title:language==='zh-Hant'?'蓋印快手王。':'Officially overqualified.',stats:[{label:language==='zh-Hant'?'張訂單':'orders stamped',value:state.taps},{label:language==='zh-Hant'?'秒':'seconds',value:state.duration}]};
+ return {score:state.score,title:language==='zh-HK'?'蓋印快手王。':language.startsWith('zh')?'蓋章高手。':'Officially overqualified.',stats:[{label:language.startsWith('zh')?'張訂單':'orders stamped',value:state.taps},{label:language.startsWith('zh')?'秒':'seconds',value:state.duration}]};
 }
 export function draw(c,state,{reduced=false,colors={}}={}){
  const ink=colors.ink??'#173e37',accent=colors.accent??'#c63826',paper=colors.paper??'#faf6e9';

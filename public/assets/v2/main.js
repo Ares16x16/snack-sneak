@@ -1,3 +1,4 @@
+import {normalizeLanguage,browserLanguage} from '../game-kit/locale.js';
 import {analytics} from '../game-kit/analytics.js';
 import {createRoundTracker} from '../game-kit/analytics-round.js';
 const tracking=createRoundTracker(analytics);
@@ -15,8 +16,8 @@ import {createAudio} from '../audio.js';
 
 const $=id=>document.getElementById(id),params=new URLSearchParams(location.search);
 let storage;try{storage=localStorage;}catch{storage=null;}
-const preferred=getPreference(storage,'language',navigator.language.startsWith('zh')?'zh-Hant':'en');
-let lang=['en','zh-Hant'].includes(params.get('lang'))?params.get('lang'):['en','zh-Hant'].includes(preferred)?preferred:'en';
+const preferred=getPreference(storage,'language',browserLanguage(navigator.language));
+let lang=normalizeLanguage(params.get('lang'),normalizeLanguage(preferred));
 const linkedDate=normalizeChallenge(params.get('challenge'));
 const linkedPractice=/^[a-f0-9]{16}$/.test(params.get('run')??'')?params.get('run'):null;
 let date=linkedDate??challengeDate(),mode=linkedPractice?'practice':'daily',practiceId=linkedPractice;
@@ -38,7 +39,7 @@ function soundState(){
 }
 function refreshMode(){
  for(const value of ['daily','practice']){const button=$(value+'-mode');button.setAttribute('aria-selected',String(mode===value));button.disabled=screen==='running'||screen==='paused';button.tabIndex=mode===value?0:-1;}
- $('seed-note').textContent=mode==='daily'?t('dailyNote',{date}):t('practiceNote');
+ $('seed-note').textContent='';$('seed-note').hidden=true;
  const best=readBest(storage,bestKey());$('best').textContent=best?format(best):'—';
  const show=target!==null&&(linkedPractice?mode==='practice'&&practiceId===linkedPractice:linkedDate&&mode==='daily'&&date===linkedDate);
  $('target-note').hidden=!show;if(show)$('target-note').textContent=t('target',{score:format(target)});
@@ -54,7 +55,7 @@ function language(){
  document.documentElement.lang=lang;
  lastBoss='';
  for(const element of document.querySelectorAll('[data-copy]'))element.textContent=t(element.dataset.copy);
- $('lang-button').textContent=lang==='en'?'繁中':'EN';$('lang-button').setAttribute('aria-label',lang==='en'?'切換至繁體中文':'Switch to English');
+ $('lang-button').value=lang;
  canvas.setAttribute('aria-label',t('canvas'));soundState();refreshMode();renderHud();
  if(summary){renderResult();prepareImage();}
 }
@@ -64,7 +65,7 @@ function start(){
  if(mode==='daily'&&!linkedDate)date=challengeDate();
  if(mode==='practice')practiceId??=randomId();
  run=createRun(mode==='daily'?'daily:'+date:'practice:'+practiceId);
- tracking.start({game_id:gameConfig.id,mode,language:lang});
+ analytics.play();tracking.start({game_id:gameConfig.id,mode,language:lang});
  summary=null;sharing.reset();resetInput();accumulator=0;last=performance.now();lastBoss='';
  $('record-note').hidden=true;
  setScreen('running');audio.unlock();audio.play('start');canvas.focus({preventScroll:true});
@@ -113,7 +114,7 @@ function getLink(){
 }
 async function prepareImage(){
  if(!summary)return;const snapshot={...summary},language=lang,title=t(summary.title),detail=t('resultDetail',summary),labelDate=mode==='daily'?date:t('practice');
- const stats=[{label:lang==='en'?'snacks':'份美食',value:snapshot.snacks},{label:lang==='en'?'bites':'啖',value:snapshot.bites},{label:lang==='en'?'close calls':'次驚險逃過',value:snapshot.nearMisses}];
+ const stats=[{label:lang==='en'?'snacks':lang==='zh-HK'?'份嘢食':'份餐點',value:snapshot.snacks},{label:lang==='en'?'bites':lang==='zh-HK'?'啖':'口',value:snapshot.bites},{label:lang==='en'?'close calls':lang==='zh-HK'?'次險過剃頭':'次驚險逃過',value:snapshot.nearMisses}];
  await sharing.setResult({...snapshot,title,detail,stats,mode,date:labelDate,url:getLink(),message:shareMessage(gameConfig,snapshot,lang)},{language,ready:foodArtReady,drawArtwork:c=>drawResultScene(c,snapshot),makePost:async()=>{
   await Promise.all([document.fonts?.ready,foodArtReady]);const card=document.createElement('canvas');card.width=1080;card.height=1350;
   drawReview(card.getContext('2d'),snapshot,{title,detail,date:labelDate,language});return new Promise((resolve,reject)=>card.toBlob(blob=>blob?resolve(blob):reject(new Error('Image unavailable')),'image/png'));
@@ -132,7 +133,7 @@ function frame(now){
 }
 $('start-run').addEventListener('click',start);$('again-run').addEventListener('click',start);$('restart-run').addEventListener('click',start);
 $('pause-run').addEventListener('click',pause);$('resume-run').addEventListener('click',resume);
-$('lang-button').addEventListener('click',()=>{lang=lang==='en'?'zh-Hant':'en';setPreference(storage,'language',lang);language();});
+$('lang-button').addEventListener('change',()=>{lang=normalizeLanguage($('lang-button').value);setPreference(storage,'language',lang);language();});
 $('sound-button').addEventListener('click',()=>{sound=!sound;setPreference(storage,'sound',sound?'on':'off');audio.setEnabled(sound);soundState();if(sound)audio.play('start');});
 for(const value of ['daily','practice']){
  const button=$(value+'-mode');button.addEventListener('click',()=>chooseMode(value));
@@ -146,7 +147,7 @@ for(const element of [canvas,$('eat-button')]){
 $('eat-button').addEventListener('keydown',event=>{if(event.code==='Enter'&&screen==='running'){event.preventDefault();keyHeld=true;}});
 $('eat-button').addEventListener('keyup',event=>{if(event.code==='Enter')keyHeld=false;});
 document.addEventListener('keydown',event=>{
- if(event.target instanceof HTMLInputElement||event.ctrlKey||event.metaKey||event.altKey)return;
+ if(event.target instanceof HTMLInputElement||event.target.tagName==='SELECT'||event.ctrlKey||event.metaKey||event.altKey)return;
  if(['Escape','KeyP'].includes(event.code)&&(screen==='running'||screen==='paused')){event.preventDefault();screen==='running'?pause():resume();return;}
  if(event.code!=='Space')return;
  if(event.target instanceof HTMLButtonElement&&event.target.id!=='eat-button')return;

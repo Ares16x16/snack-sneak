@@ -11,11 +11,15 @@
   },
   "share": {
     "en": "{score} points in {name}. Beat that?",
-    "zh-Hant": "{name} {score} 分，你破唔破到？"
+    "zh-Hant": "{name} {score} 分，你破唔破到？",
+    "zh-HK": "{name} {score} 分，你破唔破到？",
+    "zh-TW": "我在 {name} 得到 {score} 分，你能打破紀錄嗎？"
   },
   "challengeCaption": {
     "en": "Eat fast. Act innocent.",
-    "zh-Hant": "趁老闆唔望，快啲偷食。"
+    "zh-Hant": "趁老闆唔望，快啲偷食。",
+    "zh-HK": "趁老闆唔望，快啲偷食。",
+    "zh-TW": "趁老闆沒注意，趕快偷吃。"
   },
   "games": [
     {

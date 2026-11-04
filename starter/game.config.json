@@ -11,18 +11,26 @@
   },
   "tagline": {
     "en": "Stamp the orders.",
-    "zh-Hant": "十秒蓋幾多張單？"
+    "zh-Hant": "十秒蓋幾多張單？",
+    "zh-HK": "十秒蓋幾多張單？",
+    "zh-TW": "十秒能蓋幾張訂單？"
   },
   "instructions": {
     "en": "Tap or press Space. Ten seconds.",
-    "zh-Hant": "撳掣或空白鍵蓋印，限時十秒。"
+    "zh-Hant": "撳掣或空白鍵蓋印，限時十秒。",
+    "zh-HK": "撳掣或空白鍵蓋印，限時十秒。",
+    "zh-TW": "按按鈕或空白鍵蓋章，限時十秒。"
   },
   "action": {
     "en": "STAMP AN ORDER",
-    "zh-Hant": "撳掣蓋印"
+    "zh-Hant": "撳掣蓋印",
+    "zh-HK": "撳掣蓋印",
+    "zh-TW": "按下蓋章"
   },
   "share": {
     "en": "I scored {score} in {name}. Can you beat me?",
-    "zh-Hant": "我喺 {name} 拎到 {score} 分，你破唔破到我紀錄？"
+    "zh-Hant": "我喺 {name} 拎到 {score} 分，你破唔破到我紀錄？",
+    "zh-HK": "我喺 {name} 拎到 {score} 分，你破唔破到我紀錄？",
+    "zh-TW": "我在 {name} 得到 {score} 分，你能打破紀錄嗎？"
   }
 }

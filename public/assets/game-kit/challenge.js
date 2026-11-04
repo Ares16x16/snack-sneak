@@ -1,4 +1,4 @@
-const languages=['en','zh-Hant'];
+const languages=['en','zh-HK','zh-TW','zh-Hant'];
 export function challengeDate(now=new Date()){
  const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Hong_Kong',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(now);
  const get=type=>parts.find(p=>p.type===type).value;return `${get('year')}-${get('month')}-${get('day')}`;

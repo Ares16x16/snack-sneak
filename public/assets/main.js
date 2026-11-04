@@ -1,3 +1,5 @@
+import {decorateShareControl} from './game-kit/share-icons.js';
+import {normalizeLanguage,browserLanguage} from './game-kit/locale.js';
 import {analytics} from './game-kit/analytics.js';
 import {createRoundTracker} from './game-kit/analytics-round.js';
 const tracking=createRoundTracker(analytics);
@@ -12,8 +14,8 @@ const $ = id => document.getElementById(id);
 const params=new URLSearchParams(location.search);
 let storage;
 try { storage=localStorage; } catch { storage=null; }
-const preferred=getPreference(storage,'language',navigator.language.startsWith('zh')?'zh-Hant':'en');
-let language=['en','zh-Hant'].includes(params.get('lang'))?params.get('lang'):['en','zh-Hant'].includes(preferred)?preferred:'en';
+const preferred=getPreference(storage,'language',browserLanguage(navigator.language));
+let language=normalizeLanguage(params.get('lang'),normalizeLanguage(preferred));
 const linkedDate=normalizeChallenge(params.get('challenge'));
 let date=linkedDate ?? challengeDate();
 const linkedRun=/^[a-f0-9]{16}$/.test(params.get('run')??'')?params.get('run'):null;
@@ -55,7 +57,7 @@ function refreshMode() {
     $('mode-'+item).tabIndex=mode===item?0:-1;
     $('mode-'+item).disabled=phase==='running'||phase==='paused';
   }
-  $('mode-description').textContent=mode==='daily'?t('dailyDescription',{date}):t('practiceDescription');
+  $('mode-description').textContent='';$('mode-description').hidden=true;
   const matchingTarget=target!==null&&(linkedRun?mode==='practice'&&practiceRun===linkedRun:linkedDate&&mode==='daily'&&date===linkedDate);
   $('challenge-target').hidden=!matchingTarget;
   if(matchingTarget)$('challenge-target').textContent=t('target',{score:scoreFormat(target)});
@@ -67,14 +69,14 @@ function applyLanguage() {
     node.textContent=t(node.dataset.i18n);
     if(node.dataset.i18n==='controlsHint'||node.dataset.i18n==='littleBalance')node.style.whiteSpace='pre-line';
   }
-  $('language-toggle').textContent=language==='en'?'繁中':'EN';
-  $('language-toggle').setAttribute('aria-label',language==='en'?'切換至繁體中文':'Switch to English');
+  $('language-toggle').value=language;
   $('tilt-left').setAttribute('aria-label',t('tiltLeft'));
   $('tilt-right').setAttribute('aria-label',t('tiltRight'));
   $('pause-button').setAttribute('aria-label',t('pause'));
   canvas.setAttribute('aria-label',t('canvasLabel'));
   $('station-label').textContent=t(phase==='idle'?'ready':phase==='running'?'running':phase==='paused'?'paused':'finished');
   refreshMode();refreshSound();
+  for(const [id,key,icon] of [['share-button','share','native'],['copy-button','copyChallenge','copy'],['download-button','saveImage','save']])decorateShareControl($(id),icon,t(key));
   if(summary){renderResult();prepareImage();}
 }
 function resetInput() {
@@ -103,7 +105,7 @@ function startRound() {
   if(mode==='daily'&&!linkedDate)date=challengeDate();
   if(mode==='practice')practiceRun??=newPracticeRun();
   state=createGame({seed:mode==='daily'?'daily:'+date:'practice:'+practiceRun,mode});
-  tracking.start({game_id:'tray-chaos',mode,language});
+  analytics.play();tracking.start({game_id:'tray-chaos',mode,language});
   summary=null;image=null;imageVersion++;accumulator=0;previousTime=performance.now();resetInput();
   $('new-best').hidden=true;$('manual-share-link').hidden=true;
   setPhase('running');audio.unlock();audio.play('start');canvas.focus({preventScroll:true});
@@ -227,7 +229,7 @@ $('resume-button').addEventListener('click',resumeRound);
 $('share-button').addEventListener('click',shareResult);
 $('copy-button').addEventListener('click',()=>copyLink());
 $('download-button').addEventListener('click',()=>{if(image){tracking.share('save_post',{game_id:'tray-chaos',mode,language});downloadImage(image,'tray-chaos-'+(mode==='daily'?date:'practice')+'.png');announce(t('downloading'));}});
-$('language-toggle').addEventListener('click',()=>{language=language==='en'?'zh-Hant':'en';setPreference(storage,'language',language);applyLanguage();});
+$('language-toggle').addEventListener('change',()=>{language=normalizeLanguage($('language-toggle').value);setPreference(storage,'language',language);applyLanguage();});
 $('sound-toggle').addEventListener('click',()=>{audioEnabled=!audioEnabled;audio.setEnabled(audioEnabled);setPreference(storage,'sound',audioEnabled?'on':'off');refreshSound();if(audioEnabled)audio.play('start');});
 for(const choice of ['daily','practice']) {
   $('mode-'+choice).addEventListener('click',()=>chooseMode(choice));
@@ -259,7 +261,7 @@ for(const [id,direction] of [['tilt-left',-1],['tilt-right',1]]) {
   button.addEventListener('keyup',event=>{if(event.code==='Space'||event.code==='Enter')release();});
 }
 document.addEventListener('keydown',event=>{
-  if(event.target instanceof HTMLInputElement||event.metaKey||event.ctrlKey||event.altKey)return;
+  if(event.target instanceof HTMLInputElement||event.target.tagName==='SELECT'||event.metaKey||event.ctrlKey||event.altKey)return;
   if((event.code==='Escape'||event.code==='KeyP')&&(phase==='running'||phase==='paused')){
     event.preventDefault();phase==='running'?pauseRound():resumeRound();return;
   }

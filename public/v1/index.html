@@ -16,7 +16,7 @@
   <link rel="preload" href="/assets/fonts/changa-one.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="stylesheet" href="/assets/styles.css">
   <script type="module" src="/assets/main.js"></script>
-<link rel="stylesheet" href="/assets/game-kit/menu.css"><script type="module" src="/assets/game-kit/menu.js"></script></head>
+<link rel="stylesheet" href="/assets/game-kit/share.css"><link rel="stylesheet" href="/assets/game-kit/menu.css"><script type="module" src="/assets/game-kit/menu.js"></script></head>
 <body>
   <a class="skip-link" href="#game" data-i18n="skip">Skip to the game</a>
   <header class="site-header wrap">
@@ -29,7 +29,7 @@
       <button type="button" id="sound-toggle" class="icon-button" aria-label="Turn sound on" aria-pressed="false">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4zM17 9l4 6m0-6-4 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <button type="button" id="language-toggle" class="language-button" aria-label="切換至繁體中文">繁中</button>
+      <select id="language-toggle" class="language-select" aria-label="Language"><option value="en">EN</option><option value="zh-HK">HK</option><option value="zh-TW">TW</option></select>
     </nav>
   </header>
 
@@ -43,7 +43,7 @@
           <button id="mode-daily" role="tab" aria-selected="true" aria-controls="game" data-i18n="daily">Daily challenge</button>
           <button id="mode-practice" role="tab" aria-selected="false" aria-controls="game" data-i18n="practice">Practice</button>
         </div>
-        <p class="mode-description" id="mode-description"></p>
+        <p class="mode-description" id="mode-description" hidden></p>
         <div class="personal-best"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg><span data-i18n="best">Your best</span><strong id="best-score">—</strong><span class="best-local" data-i18n="onDevice">on this device</span></div>
         <p class="challenge-target" id="challenge-target" hidden></p>
         <div class="desktop-tip"><span class="tip-arrow" aria-hidden="true">↘</span><p data-i18n="desktopTip">A little tilt goes a long way. Your tea believes in you.</p></div>

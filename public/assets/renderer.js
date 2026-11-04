@@ -142,8 +142,8 @@ export function drawShareCard(ctx, summary, { title, detail, date, language }) {
   ctx.fillStyle=P.paper;ctx.fillRect(0,0,1080,1350);
   ctx.fillStyle=P.ink;ctx.fillRect(0,0,1080,140);
   ctx.textAlign='center';ctx.fillStyle=P.paper;ctx.font='400 65px "Changa One",sans-serif';ctx.fillText('tray chaos.',540,93);
-  ctx.fillStyle=P.teal;ctx.font='700 25px "DM Sans",sans-serif';ctx.fillText(language==='zh-Hant'?'你的收工單':'YOUR SHIFT RECEIPT',540,210);
-  ctx.fillStyle=P.red;ctx.font=(language==='zh-Hant'?'900 66px "PingFang TC",sans-serif':'400 68px "Changa One",sans-serif');
+  ctx.fillStyle=P.teal;ctx.font='700 25px "DM Sans",sans-serif';ctx.fillText(language==='zh-HK'?'你張收工單':language.startsWith('zh')?'你的收工單':'YOUR SHIFT RECEIPT',540,210);
+  ctx.fillStyle=P.red;ctx.font=(language.startsWith('zh')?'900 66px "PingFang TC",sans-serif':'400 68px "Changa One",sans-serif');
   ctx.fillText(title,540,307,950);
   ctx.fillStyle=P.ink;ctx.font='400 200px "Changa One",sans-serif';ctx.fillText(String(summary.score),540,510);
   ctx.font='700 27px "DM Sans","PingFang TC",sans-serif';ctx.fillText(detail,540,573,940);
@@ -153,6 +153,6 @@ export function drawShareCard(ctx, summary, { title, detail, date, language }) {
   }))};
   drawScene(ctx,state,{idle:true,reducedMotion:true,time:0});ctx.restore();
   ctx.fillStyle=P.ink;ctx.font='700 25px "DM Sans","PingFang TC",sans-serif';ctx.fillText(date,540,1251);
-  ctx.fillStyle=P.red;ctx.font='700 24px "DM Sans","PingFang TC",sans-serif';ctx.fillText(language==='zh-Hant'?'你的手比我穩嗎？':'Steadier hands than mine? Your turn.',540,1302);
+  ctx.fillStyle=P.red;ctx.font='700 24px "DM Sans","PingFang TC",sans-serif';ctx.fillText(language==='zh-HK'?'你隻手定得過我？':language.startsWith('zh')?'你的手比我穩嗎？':'Steadier hands than mine? Your turn.',540,1302);
 }
 

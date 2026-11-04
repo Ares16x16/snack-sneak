@@ -104,13 +104,13 @@ export function drawScene(c,run,{idle=false,reduced=false,time=0}={}) {
 export function drawReview(c,result,{title,detail,language,date}) {
  c.fillStyle=C.paper;c.fillRect(0,0,1080,1350);
  c.fillStyle=C.ink;c.fillRect(0,0,1080,140);c.fillStyle=C.paper;c.textAlign='center';c.font='400 64px "Changa One",sans-serif';c.fillText('SNACK SNEAK',540,94);
- c.fillStyle=C.red;c.font=language==='zh-Hant'?'900 58px "PingFang TC",sans-serif':'400 64px "Changa One",sans-serif';c.fillText(title,540,260,965);
+ c.fillStyle=C.red;c.font=language.startsWith('zh')?'900 58px "PingFang TC",sans-serif':'400 64px "Changa One",sans-serif';c.fillText(title,540,260,965);
  c.fillStyle=C.ink;c.font='400 165px "Changa One",sans-serif';c.fillText(String(result.score),540,449);
  c.font='700 26px "DM Sans","PingFang TC",sans-serif';c.fillText(detail,540,512,950);
  c.save();c.translate(40,570);c.scale(1000/820,1000/820);
  drawResultScene(c,result);c.restore();
  c.fillStyle=C.ink;c.font='700 25px "DM Sans",sans-serif';c.fillText(date,540,1250);
- c.fillStyle=C.red;c.font='700 26px "DM Sans","PingFang TC",sans-serif';c.fillText(language==='zh-Hant'?'你的工作評核會比較好嗎？':'Your performance review could be worse. Try it.',540,1304,960);
+ c.fillStyle=C.red;c.font='700 26px "DM Sans","PingFang TC",sans-serif';c.fillText(language==='zh-HK'?'你張評核會靚啲咩？':language.startsWith('zh')?'你的工作評核會比較好嗎？':'Your performance review could be worse. Try it.',540,1304,960);
 }
 export function drawResultScene(c,result){
  const r={elapsed:0,caughtUntil:result.strikes>=3?1:0,looks:[],held:false,needsRelease:false,foodIndex:result.foodIndex,foodBites:0,lastBiteAt:-100};

@@ -14,5 +14,5 @@ export async function loadGameConfig(url=localPath('/game-config.json')){
  return validateGameConfig(await response.json());
 }
 export function gameText(value,language='en',fallback=''){
- return typeof value==='string'?value:value?.[language]??value?.en??fallback;
+ return typeof value==='string'?value:value?.[language]??(language.startsWith('zh')?value?.['zh-Hant']:null)??value?.en??fallback;
 }

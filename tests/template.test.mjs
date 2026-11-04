@@ -21,6 +21,7 @@ test('a generated standalone game includes the shared flow and can build without
   assert.ok(!(await readdir(join(destination,'public/assets'))).includes('v2'));
   await buildSite({sourceDir:join(destination,'public'),outputDir:join(destination,'dist')});
   assert.match(await readFile(join(destination,'dist/index.html'),'utf8'),/Noodle Rush/);
+  assert.match(await readFile(join(destination,'dist/index.html'),'utf8'),/id="kit-seed" hidden/);
   assert.ok((await readdir(join(destination,'dist/assets/game-kit'))).includes('share-panel.js'));
  }finally{await rm(parent,{recursive:true,force:true});}
 });

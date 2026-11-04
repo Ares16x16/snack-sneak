@@ -5,7 +5,7 @@ const menus=[...document.querySelectorAll('[data-game-menu]')];
 if(menus.length){
  const config=await loadGameConfig().catch(()=>null);
  function translate(){
-  const language=document.documentElement.lang,label=language==='zh-Hant'?'遊戲':'Games';
+  const language=document.documentElement.lang,label=language.startsWith('zh')?'遊戲':'Games';
   for(const menu of menus){
    const summary=menu.querySelector('summary');summary.textContent=label;
    const nav=menu.querySelector('nav');nav.setAttribute('aria-label',label);

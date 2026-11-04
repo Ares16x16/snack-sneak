@@ -1,5 +1,7 @@
 import {isPublicURL} from './challenge.js';
 const labels={en:{points:'points',beat:'CAN YOU BEAT THIS?',preview:'Preview · challenge link available after launch',daily:'DAILY CHALLENGE',practice:'PRACTICE RUN'},'zh-Hant':{points:'分',beat:'夠唔夠膽挑戰？',preview:'預覽 · 發佈後即可分享挑戰連結',daily:'每日挑戰',practice:'練習挑戰'}};
+labels['zh-HK']=labels['zh-Hant'];
+labels['zh-TW']={...labels['zh-Hant'],beat:'敢不敢挑戰？',preview:'預覽 · 發布後即可分享挑戰連結'};
 function lines(c,value,width,max=2){
  const words=String(value??'').split(/(\s+)/).filter(Boolean),out=[];let line='';
  for(const word of words){
@@ -22,8 +24,8 @@ function brand(c,value,y){
  c.fillText(text,540,y);
 }
 export function drawShareCard(c,config,result,{format='story',language='en',url,drawArtwork}={}){
- const story=format==='story',height=story?1920:1350,p=config.palette,t=labels[language]??labels.en;
- const display=language==='zh-Hant'?'900':'400',face=language==='zh-Hant'?'"PingFang TC","Microsoft JhengHei",sans-serif':'"Changa One",sans-serif';
+ const story=format==='story',height=story?1920:1350,p=config.palette,t=labels[language]??(language.startsWith('zh')?labels['zh-Hant']:labels.en);
+ const display=language.startsWith('zh')?'900':'400',face=language.startsWith('zh')?'"PingFang TC","Microsoft JhengHei",sans-serif':'"Changa One",sans-serif';
  c.fillStyle=p.paper;c.fillRect(0,0,1080,height);c.textAlign='center';
  c.fillStyle=p.ink;c.fillRect(0,0,1080,story?108:28);
  c.fillStyle=p.ink;brand(c,config.name,story?212:116);

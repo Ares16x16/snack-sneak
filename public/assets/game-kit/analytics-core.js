@@ -1,7 +1,7 @@
 import {isPublicURL} from './challenge.js';
 const hosts={us:'https://us.i.posthog.com',eu:'https://eu.i.posthog.com'};
 const events=new Set(['$pageview','game_start','game_end','game_abandon','game_pause','game_resume','game_progress','game_replay','share_click']);
-const enums={mode:['daily','practice'],language:['en','zh-Hant'],reason:['time','completed','caught','spilled','restart','mode_change','page_leave'],channel:['threads','x','whatsapp','instagram','native','copy_link','save_post','save_story'],device:['mobile','desktop']};
+const enums={mode:['daily','practice'],language:['en','zh-HK','zh-TW','zh-Hant'],reason:['time','completed','caught','spilled','restart','mode_change','page_leave'],channel:['threads','x','whatsapp','instagram','native','copy_link','save_post','save_story'],device:['mobile','desktop']};
 const numbers=new Set(['score','active_seconds','round_seconds','bites','snacks','strikes','near_misses','saved','best_combo']);
 export function validateAnalytics(value={}){
  const config={enabled:false,projectToken:'',region:'us',...value};
@@ -57,5 +57,5 @@ export function createAnalytics({config,url,referrer='',storage,sessionStorage,s
   if(!allowed())clearIdentity();else if(changed)capture('$pageview');
  }
  if(!allowed())clearIdentity();
- return {capture,allowed,available:()=>Boolean(available),choice:()=>choice,epoch:()=>generation,setConsent,storageKey,pageView:properties=>capture('$pageview',properties),syncConsent(){const saved=get(storage,storageKey+':consent');setConsent(saved==='allowed'?'allowed':'denied',{persist:false});}};
+ return {capture,allowed,available:()=>Boolean(available),choice:()=>choice,epoch:()=>generation,setConsent,storageKey,pageView:properties=>capture('$pageview',properties),enableOnPlay(){if(choice==='unknown'&&available)setConsent('allowed');},syncConsent(){const saved=get(storage,storageKey+':consent');setConsent(saved==='allowed'?'allowed':'denied',{persist:false});}};
 }
