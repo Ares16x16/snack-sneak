@@ -1,0 +1,11 @@
+{
+  "site": {
+    "url": "",
+    "contactEmail": "ed700a@gmail.com"
+  },
+  "adsense": {
+    "enabled": false,
+    "publisherId": "",
+    "slotId": ""
+  }
+}

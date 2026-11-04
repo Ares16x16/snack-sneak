@@ -1,0 +1,80 @@
+# {{GAME_NAME}}
+
+A standalone static browser game. The starter includes Daily/Practice, local bests, pause, replay, bilingual results, Threads/X/WhatsApp drafts, Instagram Story images and manual save/copy fallbacks. There is no backend or runtime package dependency.
+
+## Make it your game
+
+1. Edit `public/game-config.json`: game name, description, rules, action label, share wording, palette and round length. Keep `id` and `challengeId` unique for this title.
+2. Replace `public/assets/game.js`: export `create(seed, config)`, `step(state, input, seconds)`, `draw(context, state, options)` and `result(state, language)`.
+3. Put your own images under `public/assets/`; keep drawing assets on the same origin so result images can be exported.
+
+The included ten-second order-stamping game is a working example. Changing the config changes branding/copy; changing `game.js` changes the mechanism.
+
+`create` returns serializable state with `elapsed`, `duration`, `score` and `status: 'running'`. `step` receives `{held, presses}`; it may mutate state or return a replacement. Set `status: 'finished'` when done. `draw` paints an 820 × 500 canvas; options include `reduced`, `idle` and `colors`. Keep drawing free of state mutations. `result` returns `{score, title, stats: [{label, value}]}`. The shell owns timers, controls, local bests, reproducible links, result UI and sharing.
+
+## Run and publish
+
+```sh
+npm ci
+npm run dev
+npm run build
+```
+
+Open `http://127.0.0.1:4173`. If another local game is using that port, run `PORT=4174 npm run dev`.
+
+Publish only `dist/`. For Cloudflare, run `npx wrangler login` and `npm run deploy`. The Worker name is `{{GAME_ID}}`. After deployment, set the HTTPS origin and your contact email in `public/site-config.json`, then rebuild and deploy to the same Worker. Update the About/Privacy/How to Play pages for your actual game and operator before publication.
+
+The build refreshes marked game names/descriptions from the config. You may add `socialImage` with a local path such as `/assets/social-cover.png` to the config; create that image yourself for link previews. The build checks that configured cover files exist. Score images and 9:16 Story images are generated in the browser regardless of the link-preview cover.
+
+## Sharing and limits
+
+- Threads, X and WhatsApp open drafts. The player completes posting in that service; the website never posts automatically.
+- Instagram Story uses a 1080 × 1920 PNG. Players can use their device share sheet or save/upload it and add the copied URL with a Link sticker. Browser and installed-app support varies.
+- Local/private URLs are marked as preview links. External draft buttons activate on a public HTTPS address.
+- Scores are casual, client-side claims. A verified leaderboard or prizes require server validation.
+- Clipboard denial exposes a selectable link. Missing native sharing keeps download/copy available. Starting another run invalidates old pending images.
+
+## Security and ads
+
+`public/_headers` supplies CSP and browser protection headers; local preview applies the same rules. Scripts load from this site. Blob images are allowed for score previews. Inline CSS is allowed for the canvas UI's dynamic styling; inline scripts, objects and forms are blocked.
+
+Advertising starts disabled. The copied ad adapter requires real publisher settings and consent. The current CSP intentionally blocks external ad scripts: review the required ad/consent policy and update privacy/CSP before enabling advertisements. Keep secrets outside `public/` and use two-factor authentication on hosting/domain accounts.
+
+To create another clean starter using the same flow:
+
+```sh
+npm run new-game -- another-game --name "Another Game"
+```
+
+The command creates a new folder under `games/` and refuses to overwrite an existing folder. It resets site and advertising settings for the new title. Fonts remain self-hosted with their licenses.
+
+## Games menu
+
+Add a `games` list to `public/game-config.json` to link your games by name:
+
+```json
+"games": [
+  {"name": "Noodle Rush", "href": "/"},
+  {"name": "Snack Sneak", "href": "https://your-published-game.example/"}
+]
+```
+
+Use local paths or public HTTPS URLs. Without the list, the menu shows this game. `npm run build` refreshes page metadata and the app manifest from the config. Keep player-facing copy short.
+
+## Release and deployment
+
+```sh
+npm run check
+npm run release
+npm run deploy:check
+```
+
+These commands validate local references and production files, create fresh site/starter ZIPs with checksums, and dry-run Cloudflare. Failed validation keeps the previous release ZIPs. No extra packaging tools are required.
+
+Use the Cloudflare commands above for login and deployment. After deployment, run `npm run smoke -- https://YOUR-ACTUAL-GAME-ADDRESS`. HTTP checks cover routing, bytes and headers; test gameplay and native sharing on your phone too.
+
+## GitHub Pages
+
+Create an empty GitHub repository, push this project to main, then choose Settings → Pages → GitHub Actions. The included workflow builds and deploys the site automatically.
+
+For a local project-path build: `npm run build:pages -- --url https://YOUR-USERNAME.github.io/YOUR-REPO/`. Preview the folder at that same path with a static server. Cloudflare remains available with `npm run deploy`.

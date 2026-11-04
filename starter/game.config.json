@@ -1,0 +1,28 @@
+{
+  "id": "game-starter",
+  "name": "Tap Sprint",
+  "description": "Stamp orders in 10 seconds.",
+  "roundSeconds": 10,
+  "palette": {
+    "paper": "#faf6e9",
+    "ink": "#173e37",
+    "accent": "#c63826",
+    "secondary": "#2f6d5c"
+  },
+  "tagline": {
+    "en": "Stamp the orders.",
+    "zh-Hant": "十秒蓋幾多張單？"
+  },
+  "instructions": {
+    "en": "Tap or press Space. Ten seconds.",
+    "zh-Hant": "撳掣或空白鍵蓋印，限時十秒。"
+  },
+  "action": {
+    "en": "STAMP AN ORDER",
+    "zh-Hant": "撳掣蓋印"
+  },
+  "share": {
+    "en": "I scored {score} in {name}. Can you beat me?",
+    "zh-Hant": "我喺 {name} 拎到 {score} 分，你破唔破到我紀錄？"
+  }
+}

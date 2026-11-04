@@ -1,0 +1,27 @@
+{
+  "name": "snack-sneak",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Two Hong Kong caf\u00e9 browser games: Snack Sneak and Tray Chaos.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "start": "node scripts/serve.mjs",
+    "test": "node --test",
+    "build": "node scripts/build.mjs",
+    "check": "npm test && npm run build && node scripts/check-build.mjs",
+    "release": "npm test && node scripts/release.mjs",
+    "smoke": "node scripts/smoke.mjs",
+    "preview": "node scripts/serve.mjs --dist",
+    "deploy": "npm run check && wrangler deploy",
+    "deploy:check": "npm run check && wrangler deploy --dry-run",
+    "new-game": "node scripts/new-game.mjs",
+    "build:pages": "node scripts/build-pages.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "4.155.0"
+  }
+}

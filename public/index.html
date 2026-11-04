@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#173e37">
+<meta name="description" content="Hold to sneak bites. Release before the café boss turns around. A silly one-button stealth game with egg tarts, butter buns and satay beef noodles.">
+<meta property="og:title" content="Snack Sneak — eat fast, act innocent."><meta property="og:description" content="His lunch. Your terrible impulse control. How much can you eat before the boss catches you?"><meta property="og:type" content="website"><meta property="og:image" content="/assets/v2/social-cover.png">
+<!-- SITE_META --><title>Snack Sneak — Hong Kong café stealth game</title>
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><link rel="preload" href="/assets/fonts/changa-one.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="/assets/v2/food-atlas.png" as="image">
+<link rel="stylesheet" href="/assets/styles.css"><link rel="stylesheet" href="/assets/v2/styles.css"><script type="module" src="/assets/v2/main.js"></script>
+<link rel="stylesheet" href="/assets/game-kit/share.css">
+<link rel="stylesheet" href="/assets/game-kit/menu.css"><script type="module" src="/assets/game-kit/menu.js"></script></head><body class="sneak-page" data-screen="idle">
+<a class="skip-link" href="#snack-game">Skip to game</a>
+<header class="site-header wrap"><a class="wordmark" href="/">snack sneak<span class="wordmark-dot">.</span></a><nav class="header-actions" aria-label="Main navigation"><details class="game-menu" data-game-menu><summary>Games</summary><nav aria-label="Games"><a href="/">Snack Sneak</a><a href="/v1/">Tray Chaos</a></nav></details><button id="sound-button" class="icon-button" type="button" aria-label="Turn sound on" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4zM17 9l4 6m0-6-4 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button id="lang-button" class="language-button" type="button" aria-label="切換至繁體中文">繁中</button></nav></header>
+<main class="wrap">
+<section class="sneak-layout" aria-labelledby="snack-heading">
+<div class="sneak-intro"><h1 id="snack-heading"><span data-copy="titleA">Eat fast.</span><br><span class="tomato" data-copy="titleB">Act innocent.</span></h1><p class="sneak-lead" data-copy="intro">Hold to eat. Let go when he turns.</p>
+<div class="snack-mode" role="tablist" aria-label="Game mode"><button id="daily-mode" role="tab" aria-selected="true" data-copy="daily">Daily challenge</button><button id="practice-mode" role="tab" aria-selected="false" data-copy="practice">Practice</button></div><p id="seed-note" class="seed-note"></p>
+<div class="snack-best"><span data-copy="best">Your best</span><strong id="best">—</strong><small data-copy="local">on this device</small></div>
+<p id="target-note" class="target-note" hidden></p>
+<p class="sneak-instructions"><span class="key-cap">SPACE</span><span data-copy="holdHint">Hold Space or touch · Release to hide</span></p>
+</div>
+<div class="snack-station" id="snack-game" tabindex="-1">
+<div class="snack-station-top"><span>GOOD LUCK CAFÉ · STAFF CAM</span><button id="pause-run" class="small-button" type="button" hidden data-copy="pause">Pause</button><span id="idle-tag">BOSS IS LOOKING</span></div>
+<div class="snack-hud" aria-label="Run status"><div><small data-copy="time">TIME LEFT</small><strong><span id="remaining">30</span><small>s</small></strong></div><div><small data-copy="strikes">CAUGHT</small><strong id="strikes">0 / 3</strong></div><div><small data-copy="score">SCORE</small><strong id="score">0</strong></div></div>
+<div class="look-cue" id="look-cue"><svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10S6 3 14 3s12 7 12 7-4 7-12 7S2 10 2 10Z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14" cy="10" r="3" fill="currentColor"/></svg><span id="look-text" data-copy="safe">HE’S BUSY. SNACK TIME.</span></div>
+<div class="snack-scene" id="snack-scene"><canvas id="snack-canvas" width="820" height="500" role="img" tabindex="0" aria-label="Hold to eat when the café boss looks away; release when he turns."></canvas>
+<div id="start-layer" class="start-layer"><button id="start-run" class="button button-red" type="button" data-copy="start">Start sneaking</button></div>
+<div id="pause-layer" class="snack-overlay" hidden><h2 data-copy="paused">Paused</h2><button id="resume-run" class="button button-red" type="button" data-copy="resume">Resume</button><button id="restart-run" class="text-button" type="button" data-copy="restart">Start again</button></div>
+<div id="review-layer" class="snack-overlay review-layer" hidden tabindex="-1" aria-labelledby="review-title"><h2 id="review-title"></h2><div class="review-points"><strong id="review-score"></strong><span data-copy="points">points</span></div><p id="review-detail"></p><p id="record-note" class="record-note" hidden data-copy="newBest">New record. Definitely not a promotion.</p><div class="review-actions"><button id="again-run" class="button button-red" type="button" data-copy="again">Again</button><button id="share-review" class="button button-outline" type="button" data-copy="share">Share</button></div><div id="result-sharing" hidden></div></div>
+</div>
+<div class="snack-food"><div><strong id="food-name"></strong><span id="food-count"></span></div><div class="food-track"><span id="food-progress"></span></div></div>
+<p id="reaction" class="snack-reaction" aria-live="polite" data-copy="eventDefault">Hold when he looks away. Release before he looks back.</p>
+<div id="hold-controls" class="hold-controls" hidden><button id="eat-button" class="eat-button" type="button"><strong id="eat-label" data-copy="hold">HOLD TO EAT</strong><span data-copy="holdHint">Hold Space or touch · Release to hide</span></button></div>
+</div></section>
+<p id="accessible-cue" class="visually-hidden" aria-live="assertive" aria-atomic="true"></p>
+<p id="snack-message" class="live-message" role="status" aria-live="polite"></p>
+</main>
+<footer class="site-footer wrap"><p><span class="footer-logo">snack sneak.</span></p><nav aria-label="Footer"><a href="/how-to-play.html" data-copy="how">How to play</a><a href="/privacy.html" data-copy="privacy">Privacy</a></nav></footer>
+<noscript><p class="noscript">JavaScript is needed to play. Please enable it and refresh. 請啟用 JavaScript 後重新整理。</p></noscript>
+</body></html>

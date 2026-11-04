@@ -1,0 +1,17 @@
+{
+  "name": "Snack Sneak — 偷食記",
+  "short_name": "Snack Sneak",
+  "description": "Sneak bites of Hong Kong café food. Release before the boss looks.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#faf6e9",
+  "theme_color": "#173e37",
+  "icons": [
+    {
+      "src": "/assets/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

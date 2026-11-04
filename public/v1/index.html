@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#173e37">
+  <meta name="description" content="Catch tips, dodge snack-stealing pigeons, and shout AIYA in a chaotic 30-second café game. Play the daily challenge and share your receipt.">
+  <meta property="og:title" content="Tray Chaos — tea time, bird crime.">
+  <meta property="og:description" content="Catch tips. Save the tea. Evict pigeons with AIYA! Play a tiny daily café arcade game.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="/assets/social-cover.png">
+  <!-- SITE_META -->
+  <title>Tray Chaos — tea time, bird crime.</title>
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="preload" href="/assets/fonts/changa-one.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script type="module" src="/assets/main.js"></script>
+<link rel="stylesheet" href="/assets/game-kit/menu.css"><script type="module" src="/assets/game-kit/menu.js"></script></head>
+<body>
+  <a class="skip-link" href="#game" data-i18n="skip">Skip to the game</a>
+  <header class="site-header wrap">
+    <a class="wordmark" href="/v1/" aria-label="Tray Chaos home">
+      <svg viewBox="0 0 36 36" aria-hidden="true"><path d="M5 26h26M8 21h20l-2 5H10zM12 8h10l-1 13h-8zM15 5h8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      tray chaos<span class="wordmark-dot">.</span>
+    </a>
+    <nav aria-label="Main navigation" class="header-actions">
+      <details class="game-menu" data-game-menu><summary>Games</summary><nav aria-label="Games"><a href="/">Snack Sneak</a><a href="/v1/">Tray Chaos</a></nav></details>
+      <button type="button" id="sound-toggle" class="icon-button" aria-label="Turn sound on" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4zM17 9l4 6m0-6-4 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button type="button" id="language-toggle" class="language-button" aria-label="切換至繁體中文">繁中</button>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <section class="game-layout" aria-labelledby="main-heading">
+      <div class="intro">
+        <div class="cafe-sign" aria-hidden="true"><span>大吉茶記</span><small>GOOD LUCK CAFÉ</small></div>
+        <h1 id="main-heading"><span data-i18n="headline1">Tea time.</span><br><span class="tomato" data-i18n="headline2">Bird crime.</span></h1>
+        <p class="intro-copy" data-i18n="intro">Three treats. One very shaky tray. Get through the lunch rush with something left to serve.</p>
+        <div class="mode-switch" role="tablist" aria-label="Game mode">
+          <button id="mode-daily" role="tab" aria-selected="true" aria-controls="game" data-i18n="daily">Daily challenge</button>
+          <button id="mode-practice" role="tab" aria-selected="false" aria-controls="game" data-i18n="practice">Practice</button>
+        </div>
+        <p class="mode-description" id="mode-description"></p>
+        <div class="personal-best"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg><span data-i18n="best">Your best</span><strong id="best-score">—</strong><span class="best-local" data-i18n="onDevice">on this device</span></div>
+        <p class="challenge-target" id="challenge-target" hidden></p>
+        <div class="desktop-tip"><span class="tip-arrow" aria-hidden="true">↘</span><p data-i18n="desktopTip">A little tilt goes a long way. Your tea believes in you.</p></div>
+      </div>
+
+      <div class="game-station" id="game" tabindex="-1">
+        <div class="station-header">
+          <span class="station-title"><span class="status-dot" aria-hidden="true"></span><span id="station-label" data-i18n="ready">Ready for your shift?</span></span>
+          <button id="pause-button" type="button" class="small-button" hidden aria-label="Pause game"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7 5v10M13 5v10" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg><span data-i18n="pause">Pause</span></button>
+          <span id="idle-duration" class="duration-label" data-i18n="duration">30 SECOND SHIFT</span>
+        </div>
+        <div class="game-hud" aria-label="Round status">
+          <div><span class="hud-label" data-i18n="timeLeft">TIME LEFT</span><strong><span id="time-left">30</span><small>s</small></strong></div>
+          <div class="saved-hud"><span class="hud-label" data-i18n="onTray">ON THE TRAY</span><strong id="saved-count">3<span class="hud-slash"> / 3</span></strong></div>
+          <div class="score-hud"><span class="hud-label" data-i18n="score">SCORE</span><strong id="live-score">0</strong></div>
+        </div>
+        <div class="canvas-wrap" id="canvas-wrap">
+          <canvas id="game-canvas" width="760" height="460" role="img" aria-label="A café tray with milk tea, an egg tart and matcha. Use left and right controls to keep the tray balanced."></canvas>
+          <div id="combo-count" class="combo-count" hidden></div>
+          <div id="gust-notice" class="gust-notice" hidden aria-live="polite"></div>
+          <div id="pause-overlay" class="stage-overlay" hidden>
+            <div class="pause-mark" aria-hidden="true"><span></span><span></span></div>
+            <h2 data-i18n="takingBreak">Tea break.</h2>
+            <p data-i18n="pausedCopy">Your tray is right where you left it.</p>
+            <button id="resume-button" class="button button-red" type="button" data-i18n="resume">Back to the rush</button>
+            <button id="restart-button" class="text-button" type="button" data-i18n="restart">Start this shift again</button>
+          </div>
+          <div id="result-overlay" class="stage-overlay result-overlay" hidden tabindex="-1" aria-labelledby="result-title">
+            <span class="receipt-label" data-i18n="shiftComplete">YOUR SHIFT RECEIPT</span>
+            <h2 id="result-title"></h2>
+            <div class="receipt-score"><strong id="result-score">0</strong><span data-i18n="points">points</span></div>
+            <p id="result-detail"></p>
+            <p class="new-best" id="new-best" hidden data-i18n="newBest">A fresh personal best. Nicely served.</p>
+            <div class="result-actions"><button id="replay-button" class="button button-red" type="button" data-i18n="again">One more shift</button><button id="share-button" class="button button-outline" type="button" data-i18n="share">Share result</button></div>
+            <div class="result-links"><button id="download-button" class="text-button" type="button" data-i18n="saveImage">Save image</button><button id="copy-button" class="text-button" type="button" data-i18n="copyChallenge">Copy challenge link</button></div>
+            <input id="manual-share-link" class="manual-link" type="text" readonly hidden aria-label="Challenge link to copy">
+          </div>
+        </div>
+        <div class="time-track" aria-hidden="true"><span id="time-progress"></span></div>
+        <div class="station-bottom">
+          <div id="start-panel" class="start-panel"><p><strong data-i18n="startTitle">The lunch rush is waiting.</strong><span data-i18n="startHint">Drag to tilt. Counter the wobble.</span></p><button id="start-button" class="button button-red" type="button"><span data-i18n="start">Let's serve</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+          <div id="play-controls" class="play-controls" hidden>
+            <button id="tilt-left" class="tilt-button" type="button" aria-label="Tilt tray left"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m5-5-5 5 5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="left">Left</span></button>
+            <button id="shout-button" class="shout-button" type="button"><strong id="shout-label">AIYA!</strong><small data-i18n="shoutHint">Space · shoo pigeons</small></button>
+            <button id="tilt-right" class="tilt-button" type="button" aria-label="Tilt tray right"><span data-i18n="right">Right</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          </div>
+          <p id="result-bottom" class="result-bottom" hidden data-i18n="sameChallenge">Same tray. Same chaos. Can you do better?</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="how-strip" aria-label="Quick instructions">
+      <h2 data-i18n="littleBalance">A little balance.<br>A lot of chaos.</h2>
+      <div><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 17h24M4 17l5-5m-5 5 5 5m19-5-5-5m5 5-5 5M13 6h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><p><strong data-i18n="instruction1Title">Find your balance</strong><span data-i18n="instruction1">Drag gently, or hold ← → / A D. Keep the tray level.</span></p></div>
+      <div><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 11h18a4 4 0 1 0-4-4M4 17h23M4 23h14a4 4 0 1 1-4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><p><strong data-i18n="instruction2Title">Expect a little trouble</strong><span data-i18n="instruction2">Doors swing. Scooters pass. Tilt the other way to save your treats.</span></p></div>
+      <div><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 5h14v22l-3-2-4 2-4-2-3 2zM13 11h6M13 16h6M13 21h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><p><strong data-i18n="instruction3Title">Show off your shift</strong><span data-i18n="instruction3">Save your receipt and challenge someone with steadier hands.</span></p></div>
+    </section>
+    <p id="live-message" class="live-message" role="status" aria-live="polite"></p>
+  </main>
+  <footer class="site-footer wrap"><p><span class="footer-logo">tray chaos.</span><span data-i18n="footerLine">Made for short breaks. And second tries.</span></p><nav aria-label="Footer"><a href="/about.html" data-i18n="about">About</a><a href="/v1/how-to-play.html" data-i18n="how">How to play</a><a href="/privacy.html" data-i18n="privacy">Privacy</a></nav></footer>
+  <noscript><p class="noscript">Tray Chaos needs JavaScript to balance your tray. Please enable it, then refresh. 茶餐廳開工需要 JavaScript，請啟用後重新整理。</p></noscript>
+</body>
+</html>
+

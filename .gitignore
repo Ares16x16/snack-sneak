@@ -1,0 +1,50 @@
+# Only the root project README is published as Markdown.
+*.[mM][dD]
+*.[mM][dD][xX]
+*.[mM][aA][rR][kK][dD][oO][wW][nN]
+!/README.md
+
+# Dependencies, builds, archives and generated games.
+node_modules/
+/dist/
+/dist-pages/
+/artifacts/
+/games/
+.wrangler/
+coverage/
+*.log
+*.tsbuildinfo
+
+# AI instructions, notes, research and review evidence.
+/.agents/
+/.agent/
+/.codex/
+/.claude/
+/.cursor/
+/.gemini/
+/.impeccable/
+/docs/
+/exa-results/
+/.aider*
+/.copilot*
+
+# Credentials and machine-specific files.
+.env
+.env.*
+.dev.vars
+.dev.vars.*
+*.pem
+*.key
+*.p12
+*.pfx
+.npmrc
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Local connector configuration may contain credentials.
+/.mcp.json
+/mcp.json
+/.claude.json
+/.codex.json

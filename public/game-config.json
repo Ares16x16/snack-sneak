@@ -1,0 +1,30 @@
+{
+  "id": "snack-sneak",
+  "challengeId": "v2",
+  "name": "Snack Sneak",
+  "description": "Sneak bites of Hong Kong café food. Release before the boss looks.",
+  "palette": {
+    "paper": "#faf6e9",
+    "ink": "#173e37",
+    "accent": "#c63826",
+    "secondary": "#2f6d5c"
+  },
+  "share": {
+    "en": "{score} points in {name}. Beat that?",
+    "zh-Hant": "{name} {score} 分，你破唔破到？"
+  },
+  "challengeCaption": {
+    "en": "Eat fast. Act innocent.",
+    "zh-Hant": "趁老闆唔望，快啲偷食。"
+  },
+  "games": [
+    {
+      "href": "/",
+      "name": "Snack Sneak"
+    },
+    {
+      "href": "/v1/",
+      "name": "Tray Chaos"
+    }
+  ]
+}
