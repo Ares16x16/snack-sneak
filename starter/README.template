@@ -12,7 +12,7 @@ The included ten-second order-stamping game is a working example. Changing the c
 
 `create` returns serializable state with `elapsed`, `duration`, `score` and `status: 'running'`. `step` receives `{held, presses}`; it may mutate state or return a replacement. Set `status: 'finished'` when done. `draw` paints an 820 × 500 canvas; options include `reduced`, `idle` and `colors`. Keep drawing free of state mutations. `result` returns `{score, title, stats: [{label, value}]}`. The shell owns timers, controls, local bests, reproducible links, result UI and sharing.
 
-## Run and publish
+## Run locally
 
 ```sh
 npm ci
@@ -21,8 +21,6 @@ npm run build
 ```
 
 Open `http://127.0.0.1:4173`. If another local game is using that port, run `PORT=4174 npm run dev`.
-
-Publish only `dist/`. For Cloudflare, run `npx wrangler login` and `npm run deploy`. The Worker name is `{{GAME_ID}}`. After deployment, set the HTTPS origin and your contact email in `public/site-config.json`, then rebuild and deploy to the same Worker. Update the About/Privacy/How to Play pages for your actual game and operator before publication.
 
 The build refreshes marked game names/descriptions from the config. You may add `socialImage` with a local path such as `/assets/social-cover.png` to the config; create that image yourself for link previews. The build checks that configured cover files exist. Score images and 9:16 Story images are generated in the browser regardless of the link-preview cover.
 
@@ -61,23 +59,9 @@ Add a `games` list to `public/game-config.json` to link your games by name:
 
 Use local paths or public HTTPS URLs. Without the list, the menu shows this game. `npm run build` refreshes page metadata and the app manifest from the config. Keep player-facing copy short.
 
-## Release and deployment
+## Release checks
 
-```sh
-npm run check
-npm run release
-npm run deploy:check
-```
-
-These commands validate local references and production files, create fresh site/starter ZIPs with checksums, and dry-run Cloudflare. Failed validation keeps the previous release ZIPs. No extra packaging tools are required.
-
-Use the Cloudflare commands above for login and deployment. After deployment, run `npm run smoke -- https://YOUR-ACTUAL-GAME-ADDRESS`. HTTP checks cover routing, bytes and headers; test gameplay and native sharing on your phone too.
-
-## GitHub Pages
-
-Create an empty GitHub repository, push this project to main, then choose Settings → Pages → GitHub Actions. The included workflow builds and deploys the site automatically.
-
-For a local project-path build: `npm run build:pages -- --url https://YOUR-USERNAME.github.io/YOUR-REPO/`. Preview the folder at that same path with a static server. Cloudflare remains available with `npm run deploy`.
+Run `npm run check` to validate the game locally. Test gameplay and native sharing on your phone too.
 
 ## Optional PostHog analytics
 
